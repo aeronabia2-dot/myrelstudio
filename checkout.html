@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Checkout | Myrelstudio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#ff5fa2;
+  --accent:#e94c8f;
+  --light:#ffe1ef;
+  --dark:#333;
+  --radius:18px;
+  --shadow:0 15px 35px rgba(0,0,0,.12);
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  --bg: url("wall.jpg");
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+}
+
+/* MAIN CARD */
+.checkout-box{
+  width:100%;
+  max-width:900px;
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:35px;
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:30px;
+}
+
+/* LEFT */
+.checkout-left h2{
+  margin-top:0;
+  color:var(--primary);
+  margin-bottom:20px;
+}
+
+.checkout-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--light);
+  padding:12px 16px;
+  border-radius:12px;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+.total{
+  margin-top:20px;
+  font-size:18px;
+  font-weight:600;
+  color:var(--primary);
+  border-top:2px dashed #f5a8c8;
+  padding-top:15px;
+}
+
+/* RIGHT */
+.checkout-right{
+  background:var(--light);
+  border-radius:var(--radius);
+  padding:25px;
+}
+
+.checkout-right h3{
+  margin-top:0;
+  margin-bottom:15px;
+  color:var(--primary);
+}
+
+/* FORM */
+label{
+  display:block;
+  margin-top:14px;
+  font-size:13px;
+  font-weight:500;
+}
+
+input, select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:14px;
+  transition:.2s;
+}
+
+input:focus, select:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px #ffd1e4;
+}
+
+/* BUTTONS */
+.btn{
+  margin-top:20px;
+  width:100%;
+  padding:14px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  border:none;
+  border-radius:40px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 8px 0 #c7437f,0 15px 25px rgba(0,0,0,.25);
+  transition:.15s;
+}
+
+.btn:active{
+  transform:translateY(6px);
+  box-shadow:0 3px 0 #c7437f,0 8px 15px rgba(0,0,0,.25);
+}
+
+.back{
+  margin-top:12px;
+  background:#fff;
+  color:var(--primary);
+  box-shadow:none;
+  border:2px solid var(--primary);
+}
+
+.back:hover{
+  background:var(--primary);
+  color:#fff;
+}
+
+/* RESPONSIVE */
+@media(max-width:850px){
+  .checkout-box{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="checkout-box">
+
+  <!-- LEFT SIDE -->
+  <div class="checkout-left">
+    <h2>🧾 Order Summary</h2>
+
+    <div id="checkout-items"></div>
+
+    <div class="total" id="checkout-total"></div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="checkout-right">
+    <h3>📦 Customer Details</h3>
+
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Your full name">
+
+    <label>Phone Number</label>
+    <input type="text" id="phone" placeholder="09xxxxxxxxx">
+
+    <label>Address</label>
+    <input type="text" id="address" placeholder="Complete address">
+
+    <label>Payment Method</label>
+    <select id="payment">
+      <option value="COD">Cash on Delivery</option>
+      <option value="GCash">GCash</option>
+      <option value="PayMaya">PayMaya</option>
+    </select>
+
+    <button class="btn" onclick="placeOrder()">✨ Place Order</button>
+    <button class="btn back" onclick="goBack()">← Back to Cart</button>
+  </div>
+
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let total = 0;
+
+const itemsDiv = document.getElementById("checkout-items");
+const totalDiv = document.getElementById("checkout-total");
+
+// FIXED: DOM references
+const nameInput = document.getElementById("name");
+const phoneInput = document.getElementById("phone");
+const addressInput = document.getElementById("address");
+const paymentInput = document.getElementById("payment");
+
+// Display cart items
+cart.forEach(item => {
+  total += item.price;
+  itemsDiv.innerHTML += `
+    <div class="checkout-item">
+      <span>${item.name}</span>
+      <strong>₱${item.price}</strong>
+    </div>
+  `;
+});
+
+totalDiv.textContent = "Total: ₱" + total;
+
+function placeOrder(){
+  // VALIDATION
+  if(nameInput.value.trim() === "" ||
+     phoneInput.value.trim() === "" ||
+     addressInput.value.trim() === "") {
+    alert("Please fill up all fields");
+    return;
+  }
+
+  const orderData = {
+    customer: {
+      name: nameInput.value,
+      phone: phoneInput.value,
+      address: addressInput.value,
+      payment: paymentInput.value
+    },
+    cart: cart,
+    total: total,
+    date: new Date().toLocaleString()
+  };
+
+  // SAVE order correctly
+  localStorage.setItem("order", JSON.stringify(orderData));
+  localStorage.removeItem("cart"); // optional clear cart
+
+  // REDIRECT to success page
+  window.location.href = "success.html";
+}
+
+function goBack(){
+  window.history.back();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Receipt | Myrelstudio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#ff5fa2;
+  --accent:#e94c8f;
+  --light:#ffe1ef;
+  --dark:#333;
+  --radius:18px;
+  --shadow:0 12px 30px rgba(0,0,0,.12);
+}
+
+body{
+  margin:0;
+  --bg: url("wall.jpg");
+  font-family:'Poppins',sans-serif;
+  padding:25px;
+}
+
+.receipt{
+  max-width:650px;
+  margin:auto;
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:30px;
+  animation:fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:scale(.95);}
+  to{opacity:1; transform:scale(1);}
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.logo h2{
+  margin:0;
+  color:var(--primary);
+}
+
+.logo p{
+  font-size:13px;
+  color:#777;
+}
+
+hr{
+  border:none;
+  border-top:2px dashed #f3aac9;
+  margin:20px 0;
+}
+
+.section{
+  font-size:14px;
+  margin-bottom:15px;
+  background:var(--light);
+  padding:15px;
+  border-radius:12px;
+}
+
+.section strong{
+  color:var(--dark);
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+  margin-bottom:12px;
+  padding:8px 12px;
+  border-radius:10px;
+  transition:0.2s;
+}
+
+.item:hover{
+  background: #ffe6f0;
+}
+
+.item img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:8px;
+  margin-right:10px;
+}
+
+.item span{
+  display:block;
+}
+
+.total{
+  border-top:2px dashed #f3aac9;
+  margin-top:15px;
+  padding-top:15px;
+  font-size:18px;
+  font-weight:600;
+  color:var(--primary);
+  display:flex;
+  justify-content:space-between;
+  background:#ffe6f0;
+  padding:15px 20px;
+  border-radius:12px;
+}
+
+.actions{
+  margin-top:25px;
+  display:flex;
+  gap:10px;
+}
+
+.btn{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:30px;
+  font-size:14px;
+  cursor:pointer;
+  background:var(--primary);
+  color:#fff;
+  transition:0.2s;
+}
+
+.btn:hover{
+  background:var(--accent);
+}
+
+.btn.secondary{
+  background:#fff;
+  color:var(--primary);
+  border:2px solid var(--primary);
+}
+
+.btn.secondary:hover{
+  background:var(--primary);
+  color:#fff;
+}
+
+@media print{
+  body{
+    background:#fff;
+  }
+  .actions{
+    display:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="receipt">
+
+  <div class="logo">
+    <h2>Myrelstudio</h2>
+    <p id="order-date"></p>
+  </div>
+
+  <hr>
+
+  <div class="section" id="customer-info"></div>
+
+  <hr>
+
+  <div id="items"></div>
+
+  <div class="total">
+    <span>Total</span>
+    <span id="total"></span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" onclick="window.print()">🖨 Print</button>
+    <button class="btn secondary" onclick="goHome()">🏠 Home</button>
+  </div>
+
+</div>
+
+<script>
+const order = JSON.parse(localStorage.getItem("order"));
+
+if(!order){
+  window.location.href = "checkout.html";
+}
+
+// DATE
+document.getElementById("order-date").textContent = order.date;
+
+// CUSTOMER INFO
+document.getElementById("customer-info").innerHTML = `
+  <strong>Customer:</strong> ${order.customer.name}<br>
+  <strong>Phone:</strong> ${order.customer.phone}<br>
+  <strong>Address:</strong> ${order.customer.address}<br>
+  <strong>Payment:</strong> ${order.customer.payment}
+`;
+
+// ITEMS
+let itemsHTML = "";
+order.cart.forEach(item => {
+  itemsHTML += `
+    <div class="item">
+      ${item.img ? `<img src="${item.img}" alt="${item.name}">` : ""}
+      <span>${item.name}</span>
+      <span>₱${item.price}</span>
+    </div>
+  `;
+});
+
+document.getElementById("items").innerHTML = itemsHTML;
+
+// TOTAL
+document.getElementById("total").textContent = "₱" + order.total;
+
+// CLEAR ORDER AFTER VIEW (OPTIONAL SAFETY)
+setTimeout(() => {
+  localStorage.removeItem("order");
+}, 5000);
+
+function goHome(){
+  window.location.href = "LANG.html";
+}
+</script>
+
+</body>
+</html>
